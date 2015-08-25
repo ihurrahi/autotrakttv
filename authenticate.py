@@ -2,14 +2,17 @@ import datetime
 import simplejson
 
 from api import TraktTvApi
-from utils import AUTH_PATH
+from utils import AUTH_PATH, load_secrets
 
-PIN_URL = 'https://trakt.tv/pin/5954'
+PIN_URL = 'https://trakt.tv/pin/%s'
 
 def auth_flow(**kwargs):
   api = TraktTvApi()
 
-  print 'Head to %s to authenticate and enter your PIN below:' % PIN_URL
+  secrets = load_secrets()
+  pin_url = PIN_URL % secrets[PIN_ID]
+
+  print 'Head to %s to authenticate and enter your PIN below:' % pin_url
   pin = raw_input('PIN: ')
   while not pin_valid(pin):
     pin = raw_input('PIN: ')
