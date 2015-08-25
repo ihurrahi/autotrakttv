@@ -1,15 +1,24 @@
+import requests
+
 URL_BASE = 'https://api-v2launch.trakt.tv/'
 
-class TraktTvApi():
-  def __init__(self):
-    pass
+from utils import load_auth, load_secrets
 
+def get_auth_headers():
+  auth = load_auth()
+  secrets = load_secrets()
+  # TODO: refresh if expired or about to expire
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': auth['access_token'],
+    'trakt-api-version': '2',
+    'trakt-api-key': secrets['CLIENT_ID'],
+  }
+
+class TraktTvApi():
   def req(url, headers=None, body=None, data=None):
     url = URL_BASE + url
-    default_headers = {
-      'Content-Type': 'application/json'
-    }
-    headers = headers or default_headers
+    headers = headers or get_auth_headers()
     response = requests.post(url, headers=headers, data=data, body=body)
     try:
       r = response.json()
@@ -23,6 +32,9 @@ class TraktTvApi():
     return r
   
   def pin_request(pin, client_id, client_secret):
+    headers = {
+      'Content-Type': 'application/json'
+    }
     data = {
       'code': pin,
       'client_id': client_id,
@@ -30,5 +42,5 @@ class TraktTvApi():
       'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob',
       'grant_type': 'authorization_code',
     }
-    return self.req('oauth/token', data=data)
+    return self.req('oauth/token', headers=headers, data=data)
     
