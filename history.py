@@ -11,6 +11,8 @@ def reset_movie_history(date, rewrite='all', movie_id=None, **kwargs):
     for watched in all_watched:
       histories.append(api.get_watched_history(type=media_type, id=watched['movie']['ids']['trakt']))
 
+  movies = []
+  to_delete = []
   for history in histories:
     if history:
       sorted_history = sorted(history, lambda h: h['watched_at'])
@@ -21,16 +23,14 @@ def reset_movie_history(date, rewrite='all', movie_id=None, **kwargs):
       else:
         to_rewrite = sorted_history
 
-      movies = []
-      to_delete = []
       for hist in to_rewrite:
         movie_info = hist['movie']
         movie_info['watched_at'] = date
         movies.append(movie_info)
         to_delete.append(hist['id'])
 
-      print "Deleting %d history items" % len(to_delete)
-      api.remove_from_history({'ids': to_delete})
-      print "Adding %d history items" % len(movies)
-      api.add_to_history({'movies': movies})
+  print "Deleting %d history items" % len(to_delete)
+  api.remove_from_history({'ids': to_delete})
+  print "Adding %d history items" % len(movies)
+  api.add_to_history({'movies': movies})
   
