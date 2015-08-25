@@ -3,7 +3,6 @@ import requests
 import simplejson
 
 SECRETS_FILE = 'secrets'
-CLIENT_ID = '3bef089a22f0a7429c2ea2cafed0cb859c9d9daa8759fc04e0549621fbcedfad'
 PIN_URL = 'https://trakt.tv/pin/5954'
 PIN_REQUEST_URL = 'https://api-v2launch.trakt.tv/oauth/token'
 
@@ -20,7 +19,7 @@ def auth_flow(args):
   }
   data = {
     'code': pin,
-    'client_id': CLIENT_ID,
+    'client_id': secrets['CLIENT_ID'],
     'client_secret': secrets['CLIENT_SECRET'],
     'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob',
     'grant_type': 'authorization_code',
@@ -61,16 +60,18 @@ def _load_secrets():
 def get_auth_headers(auth_path):
   try:
     auth_file = open(auth_path, 'r')
+    secrets_file = open(SECRETS_FILE, 'r')
   except:
     raise
   else:
-    with auth_file:
+    with auth_file, secrets_file:
       auth = simplejson.load(auth_file)
+      secrets = simplejson.load(secrets_file
       # TODO: refresh if expired or about to expire
       return {
         'Content-Type': 'application/json',
         'Authorization': auth['access_token'],
         'trakt-api-version': '2',
-        'trakt-api-key': CLIENT_ID,
+        'trakt-api-key': secrets['CLIENT_ID'],
       }
 
