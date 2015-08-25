@@ -27,7 +27,7 @@ class TraktTvApi():
       print e
       r = {}
     
-    if response.status_code != 200:
+    if response.status_code < 200 or response.status_code >= 300:
       raise Exception('Error authenticating - got %s: %s' % (response.status_code, r.get('error_description', '')))
     return r
   
