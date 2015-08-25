@@ -6,7 +6,7 @@ SECRETS_FILE = 'secrets'
 PIN_URL = 'https://trakt.tv/pin/5954'
 PIN_REQUEST_URL = 'https://api-v2launch.trakt.tv/oauth/token'
 
-def auth_flow(args):
+def auth_flow(auth_path, **kwargs):
   print 'Head to %s to authenticate and enter your PIN below:' % PIN_URL
   pin = raw_input('PIN: ')
   while not pin_valid(pin):
@@ -35,7 +35,7 @@ def auth_flow(args):
   if response.status_code != 200:
     print 'Error authenticating: %s' % r.get('error_description', '')
   else:
-    with open(args.auth_file, 'w') as auth_file:
+    with open(auth_path, 'w') as auth_file:
       expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=r['expires_in'])
       r['expires_on'] = expires.isoformat()
       simplejson.dump(r, auth_file, indent=2)
@@ -66,7 +66,7 @@ def get_auth_headers(auth_path):
   else:
     with auth_file, secrets_file:
       auth = simplejson.load(auth_file)
-      secrets = simplejson.load(secrets_file
+      secrets = simplejson.load(secrets_file)
       # TODO: refresh if expired or about to expire
       return {
         'Content-Type': 'application/json',
