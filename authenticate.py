@@ -14,9 +14,7 @@ def auth_flow(**kwargs):
   while not pin_valid(pin):
     pin = raw_input('PIN: ')
 
-  secrets = _load_secrets()
-
-  response = api.pin_request(pin, secrets['CLIENT_ID'], secrets['CLIENT_SECRET'])
+  response = api.pin_request(pin)
 
   with open(AUTH_PATH, 'w') as auth_file:
     expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=response['expires_in'])
